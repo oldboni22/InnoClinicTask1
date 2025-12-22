@@ -1,0 +1,37 @@
+name: .NET Tests
+
+# Триггеры: запускаем тесты при пуше в main или при создании Pull Request в main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # Используем Linux агент (самый быстрый и дешевый)
+
+    steps:
+    # 1. Забираем код из репозитория
+    - uses: actions/checkout@v4
+
+    # 2. Устанавливаем .NET SDK (укажи свою версию, например 8.0.x)
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # 3. Восстанавливаем пакеты (NuGet restore)
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # 4. Собираем проект
+    # Флаг --no-restore ускоряет процесс, так как мы сделали это на шаге 3
+    - name: Build
+      run: dotnet build --no-restore
+
+    # 5. Запускаем тесты
+    # Флаг --no-build говорит не собирать проект заново
+    # --verbosity normal дает понятный вывод в логах
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
