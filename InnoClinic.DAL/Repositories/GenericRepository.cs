@@ -1,32 +1,56 @@
 using System.Linq.Expressions;
 using InnoClinic.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace InnoClinic.DAL.Repositories;
 
 public sealed class GenericRepository<T>(TaskDbContext context) : IGenericRepository<T> where T : EntityBase
 {
-    public Task<T> GetByIdAsync(Guid id)
+    public Task<T?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return context
+            .Set<T>()
+            .SingleOrDefaultAsync(e => e.Id == id);
     }
 
-    public Task<IEnumerable<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IEnumerable<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate)
     {
-        throw new NotImplementedException();
+        return await context
+            .Set<T>()
+            .Where(predicate)
+            .ToListAsync<T>();
     }
 
-    public Task<T> UpdateAsync(T entity)
+    public async Task<T> UpdateAsync(T entity)
     {
-        throw new NotImplementedException();
+        var updatedEntity = context.Set<T>().Update(entity);
+
+        await context.SaveChangesAsync();
+        
+        return updatedEntity.Entity;
     }
 
-    public Task<T> CreateAsync(T entity)
+    public async Task<T> CreateAsync(T entity)
     {
-        throw new NotImplementedException();
+        var createdEntity = await context.Set<T>().AddAsync(entity);
+        
+        await context.SaveChangesAsync();
+        
+        return createdEntity.Entity;
     }
 
-    public Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var target = await GetByIdAsync(id);
+        
+        if (target is null)
+        {
+            return false;
+        }
+
+        context.Set<T>().Remove(target);
+        await context.SaveChangesAsync();
+        
+        return true;
     }
 }

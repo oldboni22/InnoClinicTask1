@@ -5,7 +5,7 @@ namespace InnoClinic.DAL.Repositories;
 
 public interface IGenericRepository<T> where T : EntityBase
 {
-    Task<T> GetByIdAsync(Guid id);
+    Task<T?> GetByIdAsync(Guid id);
     
     Task<IEnumerable<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate);
     
