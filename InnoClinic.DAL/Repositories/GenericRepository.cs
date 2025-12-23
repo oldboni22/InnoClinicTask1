@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using InnoClinic.DAL.Entities;
 
 namespace InnoClinic.DAL.Repositories;
@@ -9,7 +10,7 @@ public sealed class GenericRepository<T>(TaskDbContext context) : IGenericReposi
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<T>> GetByConditionAsync(Func<T, bool> predicate)
+    public Task<IEnumerable<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate)
     {
         throw new NotImplementedException();
     }
